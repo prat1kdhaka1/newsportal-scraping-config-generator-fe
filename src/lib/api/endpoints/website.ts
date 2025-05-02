@@ -38,3 +38,44 @@ export const getWebsiteListAPI = async () => {
 
   return response.json();
 };
+
+export const getWebsiteByIdAPI = async (id: string) => {
+  const response = await fetch(`${WEBSITE_API}/${id}`, {
+    next: { tags: [`website-${id}`] },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch website");
+  }
+
+  return response.json();
+};
+
+export const updateWebsiteAPI = async (
+  id: string,
+  payload: {
+    name: string;
+    url: string;
+    is_active: boolean;
+  }
+) => {
+  const formattedPayload = {
+    name: payload.name,
+    url: payload.url,
+    is_active: payload.is_active,
+  };
+
+  await fetch(`${WEBSITE_API}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formattedPayload),
+  });
+};
+
+export const deleteWebsiteAPI = async (id: string) => {
+  await fetch(`${WEBSITE_API}/${id}`, {
+    method: "DELETE",
+  });
+};

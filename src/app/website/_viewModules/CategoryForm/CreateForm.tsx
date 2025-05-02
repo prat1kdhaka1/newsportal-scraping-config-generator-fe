@@ -1,30 +1,30 @@
-"use client";
-import { createWebsiteAPI } from '@/lib/api/endpoints/website';
+import { createCategoryAPI } from '@/lib/api/endpoints/category';
 import { Box, Button, Stack, TextInput } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useFormik } from 'formik';
 import React, { useState } from 'react'
 import * as Yup from "yup";
-import { revalidateWebsiteList } from '../../action';
-import { notifications } from '@mantine/notifications';
+import { revalidateCategoryList } from '../../action';
 
-interface WebsiteFormProps {
+interface CreateCategoryFormProps {
   close: () => void;
+  website_id: string;
 }
 
-const WebsiteForm = ({ close }: WebsiteFormProps) => {
+const CreateCategoryForm = ({ close, website_id }: CreateCategoryFormProps) => {
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (submitData: { name: string; url: string }) => {
+  const handleSubmit = async (submitData: { url: string }) => {
     setLoading(true);
     try {
-      await createWebsiteAPI(submitData);
-      revalidateWebsiteList()
+      await createCategoryAPI({ website_id, url: submitData.url });
+      revalidateCategoryList()
       close();
       notifications.show({
         color: 'green',
         title: 'Sucess',
         position: 'top-right',
-        message: 'Website added successfully!',
+        message: 'Category added successfully!',
       })
     } catch (error) {
       console.log(error)
@@ -32,26 +32,26 @@ const WebsiteForm = ({ close }: WebsiteFormProps) => {
         color: 'red',
         title: 'Failed',
         position: 'top-right',
-        message: `Failed to create website: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Failed to create category: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
     } finally {
       setLoading(false);
     }
   }
 
-  const CREATE_WEBSITE_SCHEMA = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+
+  const CREATE_CATEGORY_SCHEMA = Yup.object().shape({
     url: Yup.string().required('URL is required'),
   })
 
   const formik = useFormik({
     initialValues: {
-      name: '',
       url: '',
     },
     onSubmit: handleSubmit,
-    validationSchema: CREATE_WEBSITE_SCHEMA,
+    validationSchema: CREATE_CATEGORY_SCHEMA,
   })
+
 
   return (
     <Box
@@ -62,18 +62,8 @@ const WebsiteForm = ({ close }: WebsiteFormProps) => {
         <Stack>
           <Box>
             <TextInput
-              name='name'
-              label="Website Name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.name && formik.errors.name}
-            />
-          </Box>
-          <Box>
-            <TextInput
               name='url'
-              label="Website URL"
+              label="Category URL"
               value={formik.values.url}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -84,7 +74,7 @@ const WebsiteForm = ({ close }: WebsiteFormProps) => {
             type='submit'
             loading={loading}
           >
-            Add Website
+            Add Category
           </Button>
         </Stack>
       </form>
@@ -92,4 +82,4 @@ const WebsiteForm = ({ close }: WebsiteFormProps) => {
   )
 }
 
-export default WebsiteForm
+export default CreateCategoryForm

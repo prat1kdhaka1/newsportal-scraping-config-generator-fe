@@ -1,5 +1,5 @@
 import React from 'react'
-import CustomTable from './CustomTable';
+import WebsiteTable from './Tables/WebsiteTable';
 
 interface DashboardPropsType {
   data: any[]
@@ -10,7 +10,7 @@ const DashboardComponent = (props: DashboardPropsType) => {
 
   return (
     <>
-      <CustomTable data={data} />
+      <WebsiteTable data={data} />
     </>
   )
 }

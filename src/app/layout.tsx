@@ -34,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
+        <link rel="icon" href="/world-cog.svg" sizes="any" />
         <ColorSchemeScript />
       </head>
       <body

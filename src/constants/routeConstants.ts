@@ -6,4 +6,5 @@ export const routes = Object.freeze({
 
 export const API_ROUTES = Object.freeze({
   WEBSITE_API: `${API_URL}/website`,
+  CATEGORY_API: `${API_URL}/category`,
 });
