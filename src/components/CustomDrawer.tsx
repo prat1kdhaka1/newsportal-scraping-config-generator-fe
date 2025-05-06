@@ -4,16 +4,17 @@ interface CustomDrawerPropsType {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  size?: string;
 }
 
 const CustomDrawer = (props: CustomDrawerPropsType) => {
-  const { opened, onClose, title, children } = props;
+  const { opened, onClose, title, children, size } = props;
 
   return (
     <div>
       <Drawer opened={opened} onClose={onClose} title={title}
         position='right'
-        size={'35%'}
+        size={size ?? '35%'}
       >
         {children}
       </Drawer>

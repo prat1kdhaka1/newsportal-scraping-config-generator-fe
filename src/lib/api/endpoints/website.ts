@@ -79,3 +79,67 @@ export const deleteWebsiteAPI = async (id: string) => {
     method: "DELETE",
   });
 };
+
+// export const extractCategoriesAPI = (
+//   websiteId: string,
+//   onMessage: (msg: string) => void,
+//   onError?: (err: any) => void
+// ) => {
+//   const url = `${WEBSITE_API}/extract-categories/${websiteId}`;
+//   const eventSource = new EventSource(url);
+
+//   eventSource.onmessage = (event) => {
+//     onMessage(event.data); // handle each message received
+//   };
+
+//   eventSource.onerror = (err) => {
+//     if (onError) {
+//       onError(err);
+//     }
+//     eventSource.close();
+//   };
+
+//   return eventSource; // in case you want to close it manually
+// };
+
+export const startExtractionAPI = async (websiteId: string) => {
+  const url = `${WEBSITE_API}/extract-categories/${websiteId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to start extraction process");
+    }
+
+    return response.json(); // You can return some result if needed, e.g., a success message
+  } catch (error) {
+    console.error("Error starting extraction:", error);
+    throw error;
+  }
+};
+
+// Function to check the status of the extraction process (GET request with SSE)
+export const checkExtractionStatusAPI = (
+  websiteId: string,
+  onMessage: (msg: string) => void,
+  onError?: (err: any) => void
+) => {
+  const url = `${WEBSITE_API}/extract-categories/status/${websiteId}`;
+  const eventSource = new EventSource(url);
+
+  eventSource.onmessage = (event) => {
+    onMessage(event.data); // Handle each message received
+  };
+
+  eventSource.onerror = (err) => {
+    if (onError) {
+      onError(err);
+    }
+    eventSource.close();
+  };
+
+  return eventSource; // Return eventSource if you want to close it manually
+};

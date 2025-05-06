@@ -82,3 +82,27 @@ export const deleteCategoryAPI = async (id: string) => {
     method: "DELETE",
   });
 };
+
+export const bulkCreateCategoryAPI = async (payload: {
+  website_id: string;
+  urls: string[];
+}) => {
+  const formattedPayload = {
+    website_id: payload.website_id,
+    urls: payload.urls,
+  };
+
+  const response = await fetch(`${CATEGORY_API}/bulk-create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formattedPayload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create categories");
+  }
+
+  return response.json();
+};

@@ -5,11 +5,12 @@ import React, { useState } from 'react'
 import CustomDrawer from '../CustomDrawer';
 import Link from 'next/link';
 import ConfirmModal from '../ConfirmModal';
-import { deleteWebsiteAPI } from '@/lib/api/endpoints/website';
+import { checkExtractionStatusAPI, deleteWebsiteAPI, startExtractionAPI } from '@/lib/api/endpoints/website';
 import { revalidateWebsiteList } from '@/app/dashboard/action';
 import { notifications } from '@mantine/notifications';
 import CreateWebsiteForm from '@/app/dashboard/_viewModules/WebsiteForm/CreateForm';
 import UpdateWebsiteForm from '@/app/dashboard/_viewModules/WebsiteForm/UpdateForm';
+import BulkCreateCateogryForm from '@/app/dashboard/_viewModules/CategoryForm/BulkCreateForm';
 
 interface CustomTablePropsType {
   data: any[]
@@ -21,6 +22,8 @@ const WebsiteTable = (props: CustomTablePropsType) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
   const [id, setId] = useState<string | ''>('');
+  const [isExtracting, setIsExtracting] = useState(false);
+
 
 
   const handleClickAdd = () => {
@@ -28,9 +31,15 @@ const WebsiteTable = (props: CustomTablePropsType) => {
     open();
   }
 
+  const handleClickViewCategories = (id: string) => () => {
+    setAction('viewtemp');
+    setId(id);
+    open();
+  }
+
 
   const handleClickEdit = (id: string) => () => {
-    setAction('edit');
+    setAction('update');
     setId(id);
     open();
 
@@ -57,6 +66,31 @@ const WebsiteTable = (props: CustomTablePropsType) => {
 
   }
 
+  const handleExtractCategories = (id: string) => async () => {
+    setIsExtracting(true);
+    await startExtractionAPI(id)
+
+    const eventSource = checkExtractionStatusAPI(
+      id,
+      (message) => {
+        if (message.includes('completed')) {
+          setIsExtracting(false);
+
+        }
+      },
+      (error) => {
+        setIsExtracting(false);
+      }
+    );
+
+    // Optionally, you can close the EventSource manually if needed
+    eventSource.close();
+    revalidateWebsiteList()
+
+
+
+  }
+
 
   const rows = data?.map((indvWebsite) => (
     <Table.Tr key={indvWebsite.id}>
@@ -67,6 +101,7 @@ const WebsiteTable = (props: CustomTablePropsType) => {
         <Link href={`/website/${indvWebsite.id}`}>View</Link>
         <Button size='xs' bg={'orange'} onClick={handleClickEdit(indvWebsite.id)}>Edit</Button>
         <Button size='xs' bg={'red'} onClick={handleClickDelete(indvWebsite.id)}>Delete</Button>
+        {indvWebsite.category_processing_status === 'completed' && !isExtracting ? <Button size='xs' bg={'blue'} onClick={handleClickViewCategories(indvWebsite.id)}>View Extracted Categories</Button> : <Button size='xs' bg={'green'} loading={indvWebsite.category_processing_status === 'processing' || isExtracting} onClick={handleExtractCategories(indvWebsite.id)}>Extract Categories</Button>}
       </Group>
     </Table.Tr>
   ))
@@ -83,8 +118,17 @@ const WebsiteTable = (props: CustomTablePropsType) => {
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
-      <CustomDrawer onClose={close} opened={opened} title='Add/Edit Website'>
-        {action === 'create' ? <CreateWebsiteForm close={close} /> : <UpdateWebsiteForm website={data.find(website => website.id === id)} close={close} />}
+      <CustomDrawer onClose={close} opened={opened} title='Add/Edit Website' size='50%'>
+        {
+          action === 'create' ? (
+            <CreateWebsiteForm close={close} />
+          ) : action === 'update' ? (
+            <UpdateWebsiteForm website={data.find(website => website.id === id)} close={close} />
+          ) : action === 'viewtemp' ? (
+
+            <BulkCreateCateogryForm website_id={id} close={close} />
+          ) : null
+        }
       </CustomDrawer>
       <ConfirmModal close={closeConfirm} opened={openedConfirm} title='Delete Website?'>
         <>

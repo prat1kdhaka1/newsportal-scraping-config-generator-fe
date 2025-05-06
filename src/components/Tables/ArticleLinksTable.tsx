@@ -3,21 +3,20 @@ import { Button, Group, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React, { useState } from 'react'
 import CustomDrawer from '../CustomDrawer';
-import Link from 'next/link';
 import ConfirmModal from '../ConfirmModal';
 import { notifications } from '@mantine/notifications';
-import { deleteCategoryAPI } from '@/lib/api/endpoints/category';
-import CreateCategoryForm from '@/app/website/_viewModules/CategoryForm/CreateForm';
-import UpdateCategoryForm from '@/app/website/_viewModules/CategoryForm/UpdateForm';
-import { revalidateCategoryList } from '@/app/website/action';
+import { deleteArticleLinkAPI } from '@/lib/api/endpoints/article-links';
+import { revalidateArticleLinkList } from '@/app/category/action';
+import CreateArticleLinkForm from '@/app/category/_viewModules/ArticleLinkForm/CreateForm';
+import UpdateArticleLinkForm from '@/app/category/_viewModules/ArticleLinkForm/UpdateForm';
 
-interface CategoryTablePropsType {
+interface ArticleLinksTablePropsType {
   data: any[]
-  website_id: string
+  category_id: string
 }
 
-const CategoryTable = (props: CategoryTablePropsType) => {
-  const { data, website_id } = props;
+const ArticleLinksTable = (props: ArticleLinksTablePropsType) => {
+  const { data, category_id } = props;
   const [action, setAction] = useState<string>('create')
   const [opened, { open, close }] = useDisclosure(false);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
@@ -44,29 +43,29 @@ const CategoryTable = (props: CategoryTablePropsType) => {
   }
 
   const handleConfirmDelete = async () => {
-    await deleteCategoryAPI(id);
+    await deleteArticleLinkAPI(id);
     closeConfirm();
 
     notifications.show({
       title: 'Success',
-      message: 'Category deleted successfully',
+      message: 'Article link deleted successfully',
       color: 'green',
       position: 'top-right',
       autoClose: 3000
     })
-    revalidateCategoryList();
+    revalidateArticleLinkList();
+
   }
 
 
-  const rows = data?.map((indvCategory) => (
-    <Table.Tr key={indvCategory.id}>
-      <Table.Td>{indvCategory.website_id}</Table.Td>
-      <Table.Td>{indvCategory.url}</Table.Td>
-      <Table.Td>{indvCategory.is_active ? 'Active' : 'Inactive'}</Table.Td>
+  const rows = data?.map((indvArticleLink) => (
+    <Table.Tr key={indvArticleLink.id}>
+      <Table.Td>{indvArticleLink.category_id}</Table.Td>
+      <Table.Td>{indvArticleLink.url}</Table.Td>
       <Group p={10} align='center' justify='center' component={'td'}>
-        <Link href={`/category/${indvCategory.id}`}>View</Link>
-        <Button size='xs' bg={'orange'} onClick={handleClickEdit(indvCategory.id)}>Edit</Button>
-        <Button size='xs' bg={'red'} onClick={handleClickDelete(indvCategory.id)}>Delete</Button>
+        {/* <Link href={`/category/${indvArticleLink.id}`}>View</Link> */}
+        <Button size='xs' bg={'orange'} onClick={handleClickEdit(indvArticleLink.id)}>Edit</Button>
+        <Button size='xs' bg={'red'} onClick={handleClickDelete(indvArticleLink.id)}>Delete</Button>
       </Group>
     </Table.Tr>
   ))
@@ -75,18 +74,17 @@ const CategoryTable = (props: CategoryTablePropsType) => {
       <Table p={0}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Website ID</Table.Th>
-            <Table.Th>Category URL</Table.Th>
-            <Table.Th>Active Status</Table.Th>
-            <Table.Th style={{ textAlign: 'right' }}><Button size="xs" bg={'green'} onClick={handleClickAdd}>Add Category</Button></Table.Th>
+            <Table.Th>Category ID</Table.Th>
+            <Table.Th>Article URL</Table.Th>
+            <Table.Th style={{ textAlign: 'right' }}><Button size="xs" bg={'green'} onClick={handleClickAdd}>Add Article Link</Button></Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
       <CustomDrawer onClose={close} opened={opened} title='Add/Edit Category'>
-        {action === 'create' ? <CreateCategoryForm website_id={website_id} close={close} /> : <UpdateCategoryForm category={data.find(category => category.id === id)} close={close} />}
+        {action === 'create' ? <CreateArticleLinkForm category_id={category_id} close={close} /> : <UpdateArticleLinkForm article_link={data.find(article_link => article_link.id === id)} close={close} />}
       </CustomDrawer>
-      <ConfirmModal close={closeConfirm} opened={openedConfirm} title='Delete Category?'>
+      <ConfirmModal close={closeConfirm} opened={openedConfirm} title='Delete Article Link?'>
         <>
           <Group >
             <Button onClick={closeConfirm} variant='outline'>Cancel</Button>
@@ -98,4 +96,4 @@ const CategoryTable = (props: CategoryTablePropsType) => {
   )
 }
 
-export default CategoryTable
+export default ArticleLinksTable
