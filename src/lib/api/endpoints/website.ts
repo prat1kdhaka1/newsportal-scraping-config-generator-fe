@@ -123,11 +123,10 @@ export const startExtractionAPI = async (websiteId: string) => {
 
 // Function to check the status of the extraction process (GET request with SSE)
 export const checkExtractionStatusAPI = (
-  websiteId: string,
   onMessage: (msg: string) => void,
   onError?: (err: any) => void
 ) => {
-  const url = `${WEBSITE_API}/extract-categories/status/${websiteId}`;
+  const url = `${WEBSITE_API}/extract-categories/status`;
   const eventSource = new EventSource(url);
 
   eventSource.onmessage = (event) => {
