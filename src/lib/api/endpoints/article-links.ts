@@ -79,3 +79,26 @@ export const deleteArticleLinkAPI = async (id: string) => {
     method: "DELETE",
   });
 };
+
+export const bulkCreateArticleLinksAPI = async (payload: {
+  category_id: string;
+  urls: string[];
+}) => {
+  const formattedPayload = {
+    category_id: payload.category_id,
+    urls: payload.urls,
+  };
+  const response = await fetch(`${ARTICLE_LINKS_API}/bulk`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formattedPayload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create article links");
+  }
+
+  return response.json();
+};

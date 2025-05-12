@@ -92,7 +92,7 @@ export const bulkCreateCategoryAPI = async (payload: {
     urls: payload.urls,
   };
 
-  const response = await fetch(`${CATEGORY_API}/bulk-create`, {
+  const response = await fetch(`${CATEGORY_API}/bulk`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -104,5 +104,21 @@ export const bulkCreateCategoryAPI = async (payload: {
     throw new Error("Failed to create categories");
   }
 
+  return response.json();
+};
+
+export const extractArticleLinksAPI = async (payload: {
+  category_id: string;
+}) => {
+  const { category_id } = payload;
+  const response = await fetch(
+    `${CATEGORY_API}/extract-article-links/${category_id}`,
+    {
+      method: "POST",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to extract data");
+  }
   return response.json();
 };

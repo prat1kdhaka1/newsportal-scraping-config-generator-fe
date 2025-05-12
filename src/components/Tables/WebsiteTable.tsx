@@ -1,11 +1,11 @@
 'use client';
 import { Button, Group, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import CustomDrawer from '../CustomDrawer';
 import Link from 'next/link';
 import ConfirmModal from '../ConfirmModal';
-import { checkExtractionStatusAPI, deleteWebsiteAPI, startExtractionAPI } from '@/lib/api/endpoints/website';
+import { deleteWebsiteAPI, startExtractionAPI } from '@/lib/api/endpoints/website';
 import { revalidateWebsiteList } from '@/app/dashboard/action';
 import { notifications } from '@mantine/notifications';
 import CreateWebsiteForm from '@/app/dashboard/_viewModules/WebsiteForm/CreateForm';
@@ -32,58 +32,8 @@ const WebsiteTable = (props: CustomTablePropsType) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
   const [id, setId] = useState<string | ''>('');
-  const [processingWebsites, setProcessingWebsites] = useState<Set<string>>(new Set());
-  const [completedWebsites, setCompletedWebsites] = useState<Set<string>>(new Set());
-  const [pendingWebsites, setPendingWebsites] = useState<Set<string>>(new Set());
 
-  // Ref to store the EventSource instance
-  const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Establish SSE connection on mount
-  useEffect(() => {
-    eventSourceRef.current = checkExtractionStatusAPI(
-      (message) => {
-        try {
-          // Remove the "data: " prefix and convert Python values to JavaScript values
-          const jsonStr = message
-            .replace('data: ', '')
-            .replace(/'/g, '"')
-            .replace(/True/g, 'true')
-            .replace(/False/g, 'false');
-
-          const data = JSON.parse(jsonStr) as WebsiteType[];
-
-          const processingIds = data
-            .filter((website) => website.category_processing_status === 'processing')
-            .map((website) => website.id);
-
-          const completedIds = data
-            .filter((website) => website.category_processing_status === 'completed')
-            .map((website) => website.id);
-
-          const pendingIds = data.filter((website) => website.category_processing_status === 'pending')
-            .map((website) => website.id);
-
-          setProcessingWebsites(new Set(processingIds));
-          setCompletedWebsites(new Set(completedIds));
-          setPendingWebsites(new Set(pendingIds));
-
-        } catch (error) {
-          console.error('Error parsing SSE message:', error);
-        }
-      },
-      (error) => {
-        console.error('SSE error:', error);
-      }
-    );
-
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        console.log("SSE connection closed on unmount.");
-      }
-    };
-  }, []);
 
   const handleClickAdd = () => {
     setAction('create');
@@ -116,9 +66,16 @@ const WebsiteTable = (props: CustomTablePropsType) => {
     revalidateWebsiteList()
   }
 
-  const handleExtractCategories = (id: string) => async () => {
+  const handleExtractCategories = async (id: string) => {
+    console.log('hkhkhkh')
+    notifications.show({
+      title: 'Success',
+      message: 'Category extraction started successfully!',
+      color: 'green',
+      position: 'top-right',
+      autoClose: 3000
+    })
     await startExtractionAPI(id);
-    setProcessingWebsites(prev => new Set([...prev, id]));
   };
 
   const rows = data?.map((indvWebsite) => (
@@ -130,20 +87,20 @@ const WebsiteTable = (props: CustomTablePropsType) => {
         <Link href={`/website/${indvWebsite.id}`}>View</Link>
         <Button size='xs' bg={'orange'} onClick={handleClickEdit(indvWebsite.id)}>Edit</Button>
         <Button size='xs' bg={'red'} onClick={handleClickDelete(indvWebsite.id)}>Delete</Button>
-        <Button
+        {/* <Button
           size='xs'
           color={
-            pendingWebsites.has(indvWebsite.id)
+            indvWebsite.category_processing_status === "completed"
               ? 'blue'
-              : completedWebsites.has(indvWebsite.id)
+              : indvWebsite.category_processing_status === 'pending'
                 ? 'teal'
                 : 'gray'
           }
-          loading={processingWebsites.has(indvWebsite.id)}
+          loading={indvWebsite.category_processing_status === "processing"}
           onClick={
-            pendingWebsites.has(indvWebsite.id)
+            indvWebsite.category_processing_status === 'pending'
               ? handleExtractCategories(indvWebsite.id)
-              : completedWebsites.has(indvWebsite.id)
+              : indvWebsite.category_processing_status === 'completed'
                 ? () => {
                   setId(indvWebsite.id);
                   setAction('viewtemp');
@@ -151,22 +108,37 @@ const WebsiteTable = (props: CustomTablePropsType) => {
                 }
                 : undefined // no-op for processing
           }
-          disabled={!pendingWebsites.has(indvWebsite.id) && !completedWebsites.has(indvWebsite.id)}
+          disabled={indvWebsite.category_processing_status == "processing"}
         >
-          {pendingWebsites.has(indvWebsite.id)
-            ? 'Generate'
-            : processingWebsites.has(indvWebsite.id)
+          {indvWebsite.category_processing_status == "pending"
+            ? 'Extract Categories'
+            : indvWebsite.category_processing_status == "processing"
               ? 'Processing'
-              : completedWebsites.has(indvWebsite.id)
-                ? 'View'
+              : indvWebsite.category_processing_status == "completed"
+                ? 'View Extracted Categories'
                 : '...'}
-        </Button>
+        </Button> */}
+
+        {
+          indvWebsite.category_processing_status === "completed" ? <Button size='xs' bg={'blue'} onClick={() => {
+            setId(indvWebsite.id);
+            setAction('viewtemp');
+            open();
+            // handleExtractCategories(indvWebsite.id)
+          }
+
+          }
+          > View Categories</Button> : <Button size='xs' bg={'green'} onClick={() => {
+            console.log('clickkckckkc')
+            handleExtractCategories(indvWebsite.id)
+          }}>Extract Categories</Button>
+        }
+
 
       </Group>
     </Table.Tr>
   ))
 
-  console.log(processingWebsites)
   return (
     <>
       <Table p={0}>
@@ -180,6 +152,7 @@ const WebsiteTable = (props: CustomTablePropsType) => {
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
+
       <CustomDrawer onClose={close} opened={opened} title='Add/Edit Website' size='50%'>
         {
           action === 'create' ? (

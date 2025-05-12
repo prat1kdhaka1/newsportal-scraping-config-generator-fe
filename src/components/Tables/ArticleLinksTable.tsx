@@ -60,7 +60,7 @@ const ArticleLinksTable = (props: ArticleLinksTablePropsType) => {
 
   const rows = data?.map((indvArticleLink) => (
     <Table.Tr key={indvArticleLink.id}>
-      <Table.Td>{indvArticleLink.category_id}</Table.Td>
+      {/* <Table.Td>{indvArticleLink.category_id}</Table.Td> */}
       <Table.Td>{indvArticleLink.url}</Table.Td>
       <Group p={10} align='center' justify='center' component={'td'}>
         {/* <Link href={`/category/${indvArticleLink.id}`}>View</Link> */}
@@ -74,7 +74,7 @@ const ArticleLinksTable = (props: ArticleLinksTablePropsType) => {
       <Table p={0}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Category ID</Table.Th>
+            {/* <Table.Th>Category ID</Table.Th> */}
             <Table.Th>Article URL</Table.Th>
             <Table.Th style={{ textAlign: 'right' }}><Button size="xs" bg={'green'} onClick={handleClickAdd}>Add Article Link</Button></Table.Th>
           </Table.Tr>

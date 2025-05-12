@@ -5,6 +5,8 @@ import { useFormik } from "formik";
 import { ActionIcon, Box, Button, Checkbox, Group, Loader, Stack, TextInput, Title } from "@mantine/core";
 
 import { getTempCategoryListAPI } from "@/lib/api/endpoints/category-temp";
+import { bulkCreateCategoryAPI } from "@/lib/api/endpoints/category";
+import { notifications } from "@mantine/notifications";
 
 interface WebsiteType {
   id: string;
@@ -22,16 +24,6 @@ const BulkCreateCateogryForm = ({ close, website_id }: UpdateWebsiteFormProps) =
   const [loading, setLoading] = useState(false);
   const [fields, setFields] = useState([]);
   const [nextId, setNextId] = useState(1000); // for new fields not from API
-
-  const formik = useFormik({
-    initialValues: {
-      dynamicFields: {},
-    },
-    onSubmit: (values) => {
-      console.log('Submitted values:', values);
-    },
-  });
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,6 +74,37 @@ const BulkCreateCateogryForm = ({ close, website_id }: UpdateWebsiteFormProps) =
     }));
   };
 
+
+  const handleSubmit = async (submitData) => {
+
+    const urls = Object.values(submitData.dynamicFields as string[]);
+    const payload = {
+      website_id,
+      urls
+    }
+
+    await bulkCreateCategoryAPI(payload)
+
+    close();
+    notifications.show({
+      title: 'Success',
+      color: 'green',
+      message: 'Categories saved',
+      position: 'top-right',
+      autoClose: 3000
+    })
+
+  }
+
+
+  const formik = useFormik({
+    initialValues: {
+      dynamicFields: {},
+    },
+    onSubmit: handleSubmit
+  });
+
+
   if (loading) {
     return <Loader />
   }
@@ -126,7 +149,7 @@ const BulkCreateCateogryForm = ({ close, website_id }: UpdateWebsiteFormProps) =
               Add Field
             </Button>
           </Group>
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Save</Button>
         </Stack>
       </form>
     </Box>
