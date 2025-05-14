@@ -5,12 +5,13 @@ import React, { useState } from 'react'
 import CustomDrawer from '../CustomDrawer';
 import Link from 'next/link';
 import ConfirmModal from '../ConfirmModal';
-import { deleteWebsiteAPI, startExtractionAPI } from '@/lib/api/endpoints/website';
+import { deleteWebsiteAPI, startExtractionAPI, startScraperAPI } from '@/lib/api/endpoints/website';
 import { revalidateWebsiteList } from '@/app/dashboard/action';
 import { notifications } from '@mantine/notifications';
 import CreateWebsiteForm from '@/app/dashboard/_viewModules/WebsiteForm/CreateForm';
 import UpdateWebsiteForm from '@/app/dashboard/_viewModules/WebsiteForm/UpdateForm';
 import BulkCreateCateogryForm from '@/app/dashboard/_viewModules/CategoryForm/BulkCreateForm';
+import { downloadConfigAPI } from '@/lib/api/endpoints/config';
 
 interface WebsiteType {
   id: string;
@@ -78,6 +79,37 @@ const WebsiteTable = (props: CustomTablePropsType) => {
     await startExtractionAPI(id);
   };
 
+  const handleStartScraper = async (id: string) => {
+    notifications.show({
+      title: 'Success',
+      message: 'Scraper started successfully!',
+      color: 'green',
+      position: 'top-right',
+      autoClose: 3000
+    })
+    await startScraperAPI(id);
+  };
+
+  const handleDownloadConfig = async (id:string) => {
+    const res = await downloadConfigAPI(id);
+    console.log(res);
+
+    if (res.data) {
+      // Create a link element
+      const link = document.createElement('a');
+      link.target = '_blank';
+      link.href = res.data;
+      link.download = 'config.json'; // You can set a default filename here
+
+      // Append to the document, click and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+
+  }
+
   const rows = data?.map((indvWebsite) => (
     <Table.Tr key={indvWebsite.id}>
       <Table.Td>{indvWebsite.name}</Table.Td>
@@ -129,12 +161,18 @@ const WebsiteTable = (props: CustomTablePropsType) => {
 
           }
           > View Categories</Button> : <Button size='xs' bg={'green'} onClick={() => {
-            console.log('clickkckckkc')
             handleExtractCategories(indvWebsite.id)
           }}>Extract Categories</Button>
+          
         }
 
-
+        <Button size='xs' bg={'blue'} onClick={() => {
+          handleDownloadConfig(indvWebsite.id)
+        }} >Download Config</Button>
+        <Button size='xs' bg={'yellow'} onClick={() => {
+          // console.log('clickkckckkc')
+          handleStartScraper(indvWebsite.id)
+        }} >Start Scraper</Button>
       </Group>
     </Table.Tr>
   ))

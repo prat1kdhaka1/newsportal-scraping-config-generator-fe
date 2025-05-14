@@ -122,3 +122,16 @@ export const extractArticleLinksAPI = async (payload: {
   }
   return response.json();
 };
+
+export const generateRegexpAPI = async (payload: { category_id: string }) => {
+  const { category_id } = payload;
+  const response = await fetch(
+    `${CATEGORY_API}/extract-config/${category_id}`,
+    { method: "POST" }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to generate regular expression");
+  }
+  return response.json();
+};

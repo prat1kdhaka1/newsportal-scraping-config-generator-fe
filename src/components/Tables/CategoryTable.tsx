@@ -6,7 +6,7 @@ import CustomDrawer from '../CustomDrawer';
 import Link from 'next/link';
 import ConfirmModal from '../ConfirmModal';
 import { notifications } from '@mantine/notifications';
-import { deleteCategoryAPI, extractArticleLinksAPI } from '@/lib/api/endpoints/category';
+import { deleteCategoryAPI, extractArticleLinksAPI, generateRegexpAPI } from '@/lib/api/endpoints/category';
 import CreateCategoryForm from '@/app/website/_viewModules/CategoryForm/CreateForm';
 import UpdateCategoryForm from '@/app/website/_viewModules/CategoryForm/UpdateForm';
 import { revalidateCategoryList } from '@/app/website/action';
@@ -26,13 +26,36 @@ const CategoryTable = (props: CategoryTablePropsType) => {
 
   const handleExtractArticleLinks = async (id: string) => {
     notifications.show({
-          title: 'Success',
-          message: 'Article links extraction started successfully!',
-          color: 'green',
-          position: 'top-right',
-          autoClose: 3000
-        })
+      title: 'Success',
+      message: 'Article links extraction started successfully!',
+      color: 'green',
+      position: 'top-right',
+      autoClose: 3000
+    })
     await extractArticleLinksAPI({ "category_id": id });
+
+  }
+
+  const handleGenerateRegexp = async (id: string) => {
+    notifications.show({
+      title: 'Success',
+      message: 'Regular expression generation started successfully!',
+      color: 'green',
+      position: 'top-right',
+      autoClose: 3000
+    })
+    try {
+      await generateRegexpAPI({ "category_id": id });
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'Regular expression generation failed!',
+        color: 'red',
+        position: 'top-right',
+        autoClose: 3000
+      })
+    }
+
 
   }
 
@@ -84,14 +107,13 @@ const CategoryTable = (props: CategoryTablePropsType) => {
             setId(indvCategory.id);
             setAction('viewtemp');
             open();
-            handleExtractArticleLinks(indvCategory.id)
           }
 
           }
           > View Article Links</Button> : <Button size='xs' bg={'green'} onClick={() => handleExtractArticleLinks(indvCategory.id)}>Extract Article Links</Button>
         }
 
-        <Button size='xs' bg={'green'} >Generate Regex</Button>
+        <Button size='xs' bg={'green'} onClick={() => handleGenerateRegexp(indvCategory.id)}>Generate Regex</Button>
       </Group>
     </Table.Tr>
   ))

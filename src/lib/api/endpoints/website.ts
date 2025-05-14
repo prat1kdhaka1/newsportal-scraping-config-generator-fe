@@ -142,3 +142,23 @@ export const checkExtractionStatusAPI = (
 
   return eventSource; // Return eventSource if you want to close it manually
 };
+
+
+export const startScraperAPI = async (websiteId: string) => {
+  const url = `${WEBSITE_API}/start-scraper/${websiteId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to start extraction process");
+    }
+
+    return response.json(); // You can return some result if needed, e.g., a success message
+  } catch (error) {
+    console.error("Error starting extraction:", error);
+    throw error;
+  }
+};
