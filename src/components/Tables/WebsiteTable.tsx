@@ -119,44 +119,13 @@ const WebsiteTable = (props: CustomTablePropsType) => {
         <Link href={`/website/${indvWebsite.id}`}>View</Link>
         <Button size='xs' bg={'orange'} onClick={handleClickEdit(indvWebsite.id)}>Edit</Button>
         <Button size='xs' bg={'red'} onClick={handleClickDelete(indvWebsite.id)}>Delete</Button>
-        {/* <Button
-          size='xs'
-          color={
-            indvWebsite.category_processing_status === "completed"
-              ? 'blue'
-              : indvWebsite.category_processing_status === 'pending'
-                ? 'teal'
-                : 'gray'
-          }
-          loading={indvWebsite.category_processing_status === "processing"}
-          onClick={
-            indvWebsite.category_processing_status === 'pending'
-              ? handleExtractCategories(indvWebsite.id)
-              : indvWebsite.category_processing_status === 'completed'
-                ? () => {
-                  setId(indvWebsite.id);
-                  setAction('viewtemp');
-                  open();
-                }
-                : undefined // no-op for processing
-          }
-          disabled={indvWebsite.category_processing_status == "processing"}
-        >
-          {indvWebsite.category_processing_status == "pending"
-            ? 'Extract Categories'
-            : indvWebsite.category_processing_status == "processing"
-              ? 'Processing'
-              : indvWebsite.category_processing_status == "completed"
-                ? 'View Extracted Categories'
-                : '...'}
-        </Button> */}
+       
 
         {
           indvWebsite.category_processing_status === "completed" ? <Button size='xs' bg={'blue'} onClick={() => {
             setId(indvWebsite.id);
             setAction('viewtemp');
             open();
-            // handleExtractCategories(indvWebsite.id)
           }
 
           }
@@ -170,7 +139,6 @@ const WebsiteTable = (props: CustomTablePropsType) => {
           handleDownloadConfig(indvWebsite.id)
         }} >Download Config</Button>
         <Button size='xs' bg={'yellow'} onClick={() => {
-          // console.log('clickkckckkc')
           handleStartScraper(indvWebsite.id)
         }} >Start Scraper</Button>
         

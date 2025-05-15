@@ -4,8 +4,8 @@ const { CONTENT_API } = API_ROUTES;
 
 
 
-export const getContetntListAPI = async () => {
-  const response = await fetch(`${CONTENT_API}`, {
+export const getContentListAPI = async (category_id: string, skip: number, limit: number) => {
+  const response = await fetch(`${CONTENT_API}?category_id=${category_id}&skip=${skip}&limit=${limit}`, {
     next: { tags: ["content-list"] },
   });
 
