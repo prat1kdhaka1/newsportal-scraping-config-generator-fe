@@ -11,4 +11,5 @@ export const API_ROUTES = Object.freeze({
   ARTICLE_LINKS_TEMP_API: `${API_URL}/article-link-temp`,
   CATEGORY_TEMP_API: `${API_URL}/category-temp`,
   CONFIG_API: `${API_URL}/config`,
+  CONTENT_API: `${API_URL}/content`,  
 });

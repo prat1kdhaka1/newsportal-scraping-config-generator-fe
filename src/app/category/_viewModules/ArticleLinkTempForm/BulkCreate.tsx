@@ -37,7 +37,8 @@ const BulkCreateArticleLinkForm = ({ close, category_id }: UpdateArticleLinkForm
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await getArticleLinkTempListAPI(category_id, currentPage, limit);
+        const skip = (currentPage - 1) * limit;
+        const res = await getArticleLinkTempListAPI(category_id, skip, limit);
         setFields(res.data);
         setTotalRows(res.total_rows)
       } catch (err) {
@@ -123,17 +124,6 @@ const BulkCreateArticleLinkForm = ({ close, category_id }: UpdateArticleLinkForm
       setSaving(false);
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
 
   if (isLoading) {

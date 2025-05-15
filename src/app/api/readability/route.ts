@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     const dom = new JSDOM(htmlString);
     const reader = new Readability(dom.window.document);
     const article = reader.parse();
+    console.log(article);
 
     const response = {
       title: article?.title || '',
