@@ -12,6 +12,7 @@ const ContentsCard = (props: ContentsCardPropsType) => {
                     <Text>{indvNews.title}</Text>
                     <Text>{indvNews.content.trim().slice(0, 200)}</Text>
                     <a href={indvNews.link} target='_blank' rel='noopener noreferrer'>Link</a>
+                    <a href={`/content/${indvNews.id}`} target='_blank' rel='noopener noreferrer'>View</a>
                 </Card>
             ))}
         </>

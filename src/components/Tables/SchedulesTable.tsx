@@ -18,6 +18,7 @@ interface ScheduleType {
     id: string;
     website_id: string;
     interval_ms: number;
+    is_active: boolean;
 }
 const SchedulesTable = (props: SchedulesTablePropsType) => {
     const { data } = props;
@@ -63,6 +64,7 @@ const SchedulesTable = (props: SchedulesTablePropsType) => {
           <Table.Td>{indvSchedule.website.name}</Table.Td>
           <Table.Td>{indvSchedule.website.url}</Table.Td>
           <Table.Td>{indvSchedule.interval_ms}</Table.Td>
+          <Table.Td>{indvSchedule.is_active ? 'Active' : 'Inactive'}</Table.Td>
           <Group  component={'td'} justify='center'>
             <Button size="xs" bg={'orange'} onClick={handleClickEdit(indvSchedule.id)}>Edit</Button>
             <Button size="xs" bg={'red'} onClick={handleClickDelete(indvSchedule.id)}>Delete</Button>
@@ -78,6 +80,7 @@ const SchedulesTable = (props: SchedulesTablePropsType) => {
                 <Table.Th>Website Name</Table.Th>
                 <Table.Th>Website URL</Table.Th>
                 <Table.Th>Interval (Seconds)</Table.Th>
+                <Table.Th>Active Status</Table.Th>
                 <Table.Th style={{ textAlign: 'right' }}><Button size="xs" bg={'green'}  onClick={handleClickAdd}>Add Schedule</Button></Table.Th>
               </Table.Tr>
             </Table.Thead>

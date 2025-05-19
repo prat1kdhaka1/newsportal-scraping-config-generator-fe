@@ -64,10 +64,12 @@ export const createScheduleAPI = async (payload:{
 export const updateScheduleAPI = async (id: string,payload: {
   website_id:string;
   interval_ms:number;
+  is_active:boolean;
 }) => {
   const formattedPayload = {
     website_id: payload.website_id,
     interval_ms: payload.interval_ms,
+    is_active:payload.is_active
   };
   const response = await fetch(`${SCHEDULE_API}/${id}`, {
     method: "PUT",

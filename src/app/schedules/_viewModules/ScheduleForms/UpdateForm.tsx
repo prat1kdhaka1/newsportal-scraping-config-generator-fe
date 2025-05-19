@@ -2,7 +2,7 @@
 import * as Yup from "yup";
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { Box, Button, NumberInput, Select, Stack } from "@mantine/core";
+import { Box, Button, Checkbox, NumberInput, Select, Stack } from "@mantine/core";
 import { getWebsiteByIdAPI } from "@/lib/api/endpoints/website";
 import { notifications } from "@mantine/notifications";
 import {
@@ -15,6 +15,7 @@ interface ScheduleType {
   id: string;
   website_id: string;
   interval_ms: number;
+  is_active: boolean;
 }
 
 interface UpdateScheduleFormPropsType {
@@ -73,18 +74,19 @@ const UpdateScheduleForm = ({
         color: "red",
         title: "Failed",
         position: "top-right",
-        message: `Failed to update schedule: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
+        message: `Failed to update schedule: ${error instanceof Error ? error.message : "Unknown error"
+          }`,
       });
     } finally {
       setLoading(false);
+      revalidateScheduleList();
     }
   };
 
   const UPDATE_SCHEDULE_SCHEMA = Yup.object().shape({
     website_id: Yup.string().required("Website ID is required"),
     interval_ms: Yup.string().required("Interval is required"),
+    is_active: Yup.boolean().required("Active Status is required"),
   });
 
   const formik = useFormik({
@@ -93,6 +95,7 @@ const UpdateScheduleForm = ({
     initialValues: {
       website_id: websiteData.id || "",
       interval_ms: schedule.interval_ms,
+      is_active: schedule.is_active,
     },
     onSubmit: handleSubmit,
     validationSchema: UPDATE_SCHEDULE_SCHEMA,
@@ -136,8 +139,18 @@ const UpdateScheduleForm = ({
               disabled={pageDataLoading}
             />
           </Box>
+          <Box>
+            <Checkbox
+              name='is_active'
+              label="Active Status"
+              checked={formik.values.is_active}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.is_active && formik.errors.is_active ? String(formik.errors.is_active) : undefined}
+            />
+          </Box>
           <Button type="submit" loading={loading} disabled={pageDataLoading}>
-            Create Schedule
+            Update Schedule
           </Button>
         </Stack>
       </form>
